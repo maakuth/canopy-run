@@ -1,10 +1,72 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; height: 100%; background: #0b1a12; color: #e8f0e4; font-family: "Courier New", monospace; overflow: hidden; }
-#wrap { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
-canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #0b1a12; }
+#wrap { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; touch-action: none; }
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #0b1a12; touch-action: none; }
 #ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); image-rendering: auto; pointer-events: none; background: transparent; }
 .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; background: rgba(0,0,0,0.45); }
 .overlay.hidden { display: none; }
 .overlay .title { font-size: 28px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; margin-bottom: 8px; }
 .overlay .body { font-size: 14px; line-height: 1.5; max-width: 480px; padding: 0 16px; }
 .overlay .hint { font-size: 12px; margin-top: 12px; opacity: 0.8; }
+
+/* ---- Touch controls ---- */
+.touch-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.touch-controls .tc-group {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+  align-items: flex-end;
+}
+.tc-left { bottom: 14px; left: 14px; }
+.tc-right { bottom: 14px; right: 14px; }
+.tc-top { top: 8px; right: 8px; gap: 6px; align-items: flex-start; }
+
+.tc-btn {
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  border: 2px solid rgba(232, 240, 228, 0.55);
+  background: rgba(27, 58, 42, 0.45);
+  color: #e8f0e4;
+  font-family: "Courier New", monospace;
+  border-radius: 8px;
+  min-width: 46px;
+  min-height: 46px;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  opacity: 0.5;
+  transition: opacity 0.12s ease, background 0.12s ease;
+  cursor: pointer;
+}
+.tc-btn:active, .tc-btn.active {
+  opacity: 0.9;
+  background: rgba(27, 58, 42, 0.8);
+}
+.tc-dir { min-width: 52px; min-height: 52px; font-size: 16px; border-radius: 10px; }
+.tc-dash { min-width: 58px; min-height: 58px; border-radius: 29px; font-size: 11px; }
+.tc-jump { min-width: 72px; min-height: 72px; border-radius: 36px; font-size: 13px; font-weight: bold; }
+.tc-small { min-width: 34px; min-height: 34px; font-size: 14px; border-radius: 6px; opacity: 0.4; }
+
+/* Fine-pointer (mouse): hidden unless recently moved */
+@media (pointer: fine) {
+  .touch-controls { opacity: 0; transition: opacity 0.25s ease; }
+  .touch-controls.tc-visible { opacity: 1; }
+  .touch-controls.tc-visible .tc-btn { opacity: 0.5; }
+}
+/* Coarse-pointer (touch): always visible */
+@media (pointer: coarse) {
+  .touch-controls { opacity: 1; }
+}

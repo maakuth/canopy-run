@@ -12,6 +12,8 @@ so early runs teach fundamentals and later runs demand full mastery. High score
 - Performant on older PCs: low internal resolution (320×180), no heavy frameworks,
   object pooling, minimal allocations in the hot loop.
 - Vanilla JS + ES modules, no build step.
+- Installable PWA: `manifest.webmanifest`, service worker (`sw.js`) for offline caching,
+  and app icons under `icons/`.
 - Commit after each implementation prompt; document changes in detail.
 
 ## Architecture
@@ -42,8 +44,12 @@ Util: rng, math, pool.
 - Checkpoint: last platform touched (for pit respawn).
 
 ### Input
-Keyboard only: Arrow/WASD move, Space jump, Shift dash, Esc pause, R restart,
-M mute.
+Keyboard: Arrow/WASD move, Space jump, Shift dash, Esc pause, R restart,
+M mute, T cycle music track.
+Touch: on-screen virtual buttons (left/right, jump, dash, pause, mute,
+track, restart). Always visible on touch (coarse-pointer) devices; on
+mouse (fine-pointer) devices they fade in on mouse movement and hide
+after a short idle delay.
 
 ### Audio
 Web Audio synthesized: SFX + two selectable music loops; mute persisted.

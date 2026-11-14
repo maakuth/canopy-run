@@ -4,6 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Canopy Run</title>
+  <meta name="description" content="Non-violent, skill-based endless platformer. Guide Pip through an ever-harder natural landscape." />
+  <meta name="theme-color" content="#2a4a2a" />
+  <meta name="application-name" content="Canopy Run" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Canopy Run" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,6 +24,22 @@
       <div id="overlayTitle" class="title"></div>
       <div id="overlayBody" class="body"></div>
       <div id="overlayHint" class="hint"></div>
+    </div>
+    <div id="touchControls" class="touch-controls" aria-label="Touch controls">
+      <div class="tc-group tc-left">
+        <button class="tc-btn tc-dir" data-action="left" aria-label="Move left">&#9664;</button>
+        <button class="tc-btn tc-dir" data-action="right" aria-label="Move right">&#9654;</button>
+      </div>
+      <div class="tc-group tc-right">
+        <button class="tc-btn tc-dash" data-action="dash" aria-label="Dash">Dash</button>
+        <button class="tc-btn tc-jump" data-action="jump" aria-label="Jump">Jump</button>
+      </div>
+      <div class="tc-group tc-top">
+        <button class="tc-btn tc-small" data-action="pause" aria-label="Pause">&#10074;&#10074;</button>
+        <button class="tc-btn tc-small" data-action="mute" aria-label="Mute">&#128264;</button>
+        <button class="tc-btn tc-small" data-action="track" aria-label="Cycle track">&#9835;</button>
+        <button class="tc-btn tc-small" data-action="restart" aria-label="Restart to menu">&#8635;</button>
+      </div>
     </div>
   </div>
   <script type="module" src="src/main.js"></script>

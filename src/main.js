@@ -1,6 +1,7 @@
 import { W, H, UNLOCK_DOUBLE, UNLOCK_DASH, UNLOCK_WALL, INVULN_TIME, KNOCKBACK_X, KNOCKBACK_Y, HEARTS_MAX } from './config.js';
 import { ctx, uiCtx, clear, rect, text } from './engine/renderer.js';
 import { Loop } from './engine/loop.js';
+import './engine/touch.js';
 import { inputEndFrame, justPressed } from './engine/input.js';
 import { storage } from './engine/storage.js';
 import * as audio from './engine/audio.js';
@@ -213,3 +214,9 @@ function render(alpha) {
 
 const loop = new Loop(update, render);
 loop.start();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
