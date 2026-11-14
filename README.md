@@ -22,7 +22,7 @@ python3 -m http.server 8000
 - Mute: M
 
 ## Performance
-Internal resolution 320×180, pixelated scaling, no frameworks, object pooling
+Internal resolution 320×180, integer (nearest-neighbor) scaling up to viewport, no frameworks, object pooling
 for particles, culling of off-screen entities. Targets older PCs.
 
 ## Deploy
