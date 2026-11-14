@@ -10,8 +10,9 @@ let muted = storage.muted;
 const TRACKS = {
   chiptune: { id: 'chiptune', name: 'Chiptune', bpmBase: 110, bpmStep: 8, gain: 0.28 },
   souljazz: { id: 'souljazz', name: 'Soul/Jazz', bpmBase: 76, bpmStep: 4, gain: 0.5 },
+  chiptunerough: { id: 'chiptunerough', name: 'Chiptune (Rough)', bpmBase: 118, bpmStep: 8, gain: 0.28 },
 };
-const TRACK_ORDER = ['chiptune', 'souljazz'];
+const TRACK_ORDER = ['chiptune', 'souljazz', 'chiptunerough'];
 
 let currentTrack = (storage.musicTrack && TRACKS[storage.musicTrack])
   ? storage.musicTrack : 'chiptune';
@@ -295,6 +296,53 @@ function schedulerJazz(lookahead) {
   }
 }
 
+// ---- Rough chiptune scheduler (arpeggios + noise percussion) ---------------
+function schedulerChiptuneRough(lookahead) {
+  while (nextNoteTime < ctx.currentTime + lookahead) {
+    const mDeg = MELODY[trackState.melodyIdx % MELODY.length];
+    if (mDeg >= 0) {
+      const d = mDeg % PENT.length;
+      const arp = [d, (d + 2) % PENT.length, (d + 4) % PENT.length, (d + 2) % PENT.length];
+      const n = (musicTier >= 3) ? 5 : 4;
+      const step = beatDur / 4;
+      for (let i = 0; i < n; i++) {
+        const freq = (i < arp.length)
+        ? PENT[arp[i] % PENT.length]
+        : PENT[d % PENT.length] * 2;
+      scheduleTone(freq, nextNoteTime + i * step, step * 0.85, 'sawtooth', 0.1, 0.005, 0.04, musicTier >= 3 ? 12 : 0);
+      }
+      if (musicTier >= 2) {
+        // extra high octave stab
+        scheduleTone(PENT[d % PENT.length] * 2, nextNoteTime, beatDur * 0.4, 'square', 0.06, 0.005, 0.05);
+      }
+    }
+    if (trackState.melodyIdx % 2 === 0) {
+      const bDeg = BASS[trackState.bassIdx % BASS.length];
+      scheduleTone(BASSF[bDeg % BASSF.length], nextNoteTime, beatDur * 1.6, 'sawtooth', 0.16, 0.02, 0.1, -4);
+      trackState.bassIdx++;
+    }
+    // noise percussion
+    const beatInBar = trackState.melodyIdx % 4;
+    if (musicTier >= 1) {
+      if (beatInBar === 0 || beatInBar === 2) kick(nextNoteTime);
+      if (beatInBar === 1 || beatInBar === 3) snare(nextNoteTime);
+    } else {
+      // tier 0: light hat only
+      hat(nextNoteTime);
+    }
+    // hats on eighth notes (always)
+    hat(nextNoteTime);
+    if (musicTier >= 2) hat(nextNoteTime + beatDur / 2);
+    // rough noise burst every 4 beats at high tier
+    if (musicTier >= 3 && beatInBar === 0) {
+      playNoise(nextNoteTime, 0.06, 0.09, 3000);
+    }
+
+    nextNoteTime += beatDur;
+    trackState.melodyIdx++;
+  }
+}
+
 function scheduler() {
   if (!ctx || !musicRunning) return;
   const lookahead = 0.12;
@@ -307,6 +355,7 @@ function scheduler() {
     }
   } else {
     if (currentTrack === 'chiptune') schedulerChiptune(lookahead);
+    else if (currentTrack === 'chiptunerough') schedulerChiptuneRough(lookahead);
     else schedulerJazz(lookahead);
   }
   musicTimer = setTimeout(scheduler, 25);
@@ -321,7 +370,7 @@ export function startMusic() {
   musicTier = 0;
   beatDur = 60 / t.bpmBase;
   nextNoteTime = ctx.currentTime + 0.05;
-  if (currentTrack === 'chiptune') {
+  if (currentTrack === 'chiptune' || currentTrack === 'chiptunerough') {
     trackState = { melodyIdx: 0, bassIdx: 0 };
   } else {
     trackState = { stepIdx: 0 };

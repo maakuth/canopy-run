@@ -1,11 +1,13 @@
 # Audio — Canopy Run
 
 ## Tracks
-Two synthesized soundtracks, selectable at any time with **T** (persisted):
+Three synthesized soundtracks, selectable at any time with **T** (persisted):
 
 1. **Chiptune** — original square/triangle loop, BPM `110 + tier*8`.
 2. **Ambient Soul/Jazz** — warm pads, electric-piano stabs, walking bass, sparse
    blues/major-pentatonic melody. Base BPM 76, +4 per tier (max ~92).
+3. **Chiptune (Rough)** — rougher sawtooth arpeggios over the chiptune melody,
+   sawtooth bass, and noise percussion (kick/snare/hats). Base BPM 118, +8 per tier.
 
 ## Soul/Jazz progression
 8-bar loop, 2 beats per chord:
@@ -24,4 +26,6 @@ Two synthesized soundtracks, selectable at any time with **T** (persisted):
 - A reusable noise buffer provides snare/hat; kick is a sine sweep.
 - When muted, schedulers advance time without scheduling to preserve position.
 - Track switching restarts the scheduler and resets cursors.
-- Per-track music bus gain: Chiptune 0.28, Soul/Jazz 0.50 (ambient track was too quiet).
+- Per-track music bus gain: Chiptune 0.28, Soul/Jazz 0.50, Chiptune (Rough) 0.28.
+- Rough chiptune scheduler runs on a quarter-note grid like chiptune, arpeggiating each
+  melody degree into 4-5 sawtooth notes and adding kick/snare/hats from 250 m.
