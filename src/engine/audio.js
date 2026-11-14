@@ -326,11 +326,8 @@ function schedulerChiptuneRough(lookahead) {
     if (musicTier >= 1) {
       if (beatInBar === 0 || beatInBar === 2) kick(nextNoteTime);
       if (beatInBar === 1 || beatInBar === 3) snare(nextNoteTime);
-    } else {
-      // tier 0: light hat only
-      hat(nextNoteTime);
     }
-    // hats on eighth notes (always)
+    // hats (always)
     hat(nextNoteTime);
     if (musicTier >= 2) hat(nextNoteTime + beatDur / 2);
     // rough noise burst every 4 beats at high tier
