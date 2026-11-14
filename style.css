@@ -62,9 +62,10 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #
 
 /* Fine-pointer (mouse): hidden unless recently moved */
 @media (pointer: fine) {
-  .touch-controls { opacity: 0; transition: opacity 0.25s ease; }
-  .touch-controls.tc-visible { opacity: 1; }
-  .touch-controls.tc-visible .tc-btn { opacity: 0.5; }
+  .touch-controls { opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
+  .touch-controls.tc-visible { opacity: 1; pointer-events: auto; }
+  .touch-controls.tc-visible .tc-btn { opacity: 0.5; pointer-events: auto; }
+  .touch-controls:not(.tc-visible) .tc-btn { pointer-events: none; }
 }
 /* Coarse-pointer (touch): always visible */
 @media (pointer: coarse) {
