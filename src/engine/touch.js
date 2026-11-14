@@ -69,8 +69,12 @@ function initVisibility(root) {
     if (hideTimer) clearTimeout(hideTimer);
     hideTimer = setTimeout(() => root.classList.remove('tc-visible'), 2500);
   };
-  // On coarse pointer, keep visible class irrelevant; CSS handles.
-  window.addEventListener('mousemove', show, { passive: true });
+  const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
+  if (hasTouch) {
+    root.classList.add('tc-visible');
+  } else {
+    window.addEventListener('mousemove', show, { passive: true });
+  }
   // Show briefly on load for discoverability on fine pointers? Keep hidden initially.
 }
 

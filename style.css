@@ -67,7 +67,8 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #
   .touch-controls.tc-visible .tc-btn { opacity: 0.5; pointer-events: auto; }
   .touch-controls:not(.tc-visible) .tc-btn { pointer-events: none; }
 }
-/* Coarse-pointer (touch): always visible */
-@media (pointer: coarse) {
-  .touch-controls { opacity: 1; }
+/* Coarse-pointer / no-hover (touch): always visible */
+@media (pointer: coarse), (hover: none) {
+  .touch-controls { opacity: 1; pointer-events: auto; }
+  .touch-controls .tc-btn { pointer-events: auto; opacity: 0.55; }
 }
