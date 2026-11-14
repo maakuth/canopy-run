@@ -1,4 +1,4 @@
-import { W, H } from './config.js';
+import { W, H, UNLOCK_DOUBLE, UNLOCK_DASH, UNLOCK_WALL } from './config.js';
 import { ctx, clear, rect, text } from './engine/renderer.js';
 import { Loop } from './engine/loop.js';
 import { inputEndFrame, justPressed } from './engine/input.js';
@@ -14,6 +14,8 @@ let state = STATE.MENU;
 
 let world = createWorld();
 const player = createPlayer(40, H - 40);
+let unlockMsg = '';
+let unlockT = 0;
 
 function update(dt) {
   if (justPressed('jump') || justPressed('pause') || justPressed('restart') || justPressed('mute')) audio.audioInit();
@@ -24,11 +26,28 @@ function update(dt) {
       world = createWorld();
       player.x = 40; player.y = H - 40; player.vx = 0; player.vy = 0; player.hearts = 3;
       player.lastSafeX = 40; player.lastSafeY = H - 40;
+      player.doubleJump = false; player.dash = false; player.wall = false;
+      unlockMsg = ''; unlockT = 0;
       state = STATE.PLAYING;
     }
   } else if (state === STATE.PLAYING) {
     updateWorld(world, player, dt);
     updatePlayer(player, world.platforms, dt);
+    // ability unlocks
+    const dist = Math.floor(player.x / 10);
+    if (!player.doubleJump && dist >= UNLOCK_DOUBLE) {
+      player.doubleJump = true; unlockMsg = 'Double Jump unlocked! (SPACE in air)'; unlockT = 3;
+      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+    }
+    if (!player.dash && dist >= UNLOCK_DASH) {
+      player.dash = true; unlockMsg = 'Dash unlocked! (SHIFT)'; unlockT = 3;
+      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+    }
+    if (!player.wall && dist >= UNLOCK_WALL) {
+      player.wall = true; unlockMsg = 'Wall Slide/Jump unlocked!'; unlockT = 3;
+      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+    }
+    if (unlockT > 0) unlockT -= dt;
     cameraFollow(player.x + player.w / 2, player.y + player.h / 2, dt);
     if (justPressed('pause')) state = STATE.PAUSED;
     if (player.y > H + 60) {
@@ -82,6 +101,12 @@ function render(alpha) {
   rect(cx + (player.facing > 0 ? 2 : -4), cy - h / 2 + 2, 2, 2, '#1b3a2a');
 
   drawParticles(ctx, world, ox, oy);
+
+  if (unlockT > 0) {
+    ctx.globalAlpha = Math.min(1, unlockT);
+    text(unlockMsg, W / 2, 36, '#ffd166', 9, 'center');
+    ctx.globalAlpha = 1;
+  }
 
   // HUD
   text('Canopy Run', 8, 6, '#e8f0e4', 10);
