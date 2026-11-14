@@ -1,6 +1,6 @@
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; height: 100%; background: #0b1a12; color: #e8f0e4; font-family: "Courier New", monospace; overflow: hidden; }
-#wrap { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; touch-action: none; }
+html, body { margin: 0; padding: 0; height: 100%; height: 100dvh; background: #0b1a12; color: #e8f0e4; font-family: "Courier New", monospace; overflow: hidden; }
+#wrap { position: relative; width: 100vw; width: 100dvw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; touch-action: none; }
 canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #0b1a12; touch-action: none; }
 #ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); image-rendering: auto; pointer-events: none; background: transparent; }
 .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; background: rgba(0,0,0,0.45); }
@@ -26,9 +26,9 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #
   pointer-events: none;
   align-items: flex-end;
 }
-.tc-left { bottom: 14px; left: 14px; }
-.tc-right { bottom: 14px; right: 14px; }
-.tc-top { top: 8px; right: 8px; gap: 6px; align-items: flex-start; }
+.tc-left { bottom: calc(14px + env(safe-area-inset-bottom)); left: calc(14px + env(safe-area-inset-left)); }
+.tc-right { bottom: calc(14px + env(safe-area-inset-bottom)); right: calc(14px + env(safe-area-inset-right)); }
+.tc-top { top: calc(8px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right)); gap: 6px; align-items: flex-start; }
 
 .tc-btn {
   pointer-events: auto;
