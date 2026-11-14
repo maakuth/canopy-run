@@ -1,5 +1,5 @@
 import { W, H, UNLOCK_DOUBLE, UNLOCK_DASH, UNLOCK_WALL, INVULN_TIME, KNOCKBACK_X, KNOCKBACK_Y, HEARTS_MAX } from './config.js';
-import { ctx, clear, rect, text } from './engine/renderer.js';
+import { ctx, uiCtx, clear, rect, text } from './engine/renderer.js';
 import { Loop } from './engine/loop.js';
 import { inputEndFrame, justPressed } from './engine/input.js';
 import { storage } from './engine/storage.js';
@@ -168,19 +168,19 @@ function render(alpha) {
   drawParticles(ctx, world, ox, oy);
 
   if (unlockT > 0) {
-    ctx.globalAlpha = Math.min(1, unlockT);
+    uiCtx.globalAlpha = Math.min(1, unlockT);
     text(unlockMsg, W / 2, 36, '#ffd166', 9, 'center');
-    ctx.globalAlpha = 1;
+    uiCtx.globalAlpha = 1;
   }
   if (trackMsgT > 0) {
-    ctx.globalAlpha = Math.min(1, trackMsgT);
+    uiCtx.globalAlpha = Math.min(1, trackMsgT);
     text(trackMsg, W / 2, 50, '#a8dadc', 9, 'center');
-    ctx.globalAlpha = 1;
+    uiCtx.globalAlpha = 1;
   }
   if (world.activeTrigger && world.activeTrigger.t > 0) {
-    ctx.globalAlpha = Math.min(1, world.activeTrigger.t);
+    uiCtx.globalAlpha = Math.min(1, world.activeTrigger.t);
     text(world.activeTrigger.msg, W / 2, H - 28, '#a8dadc', 8, 'center');
-    ctx.globalAlpha = 1;
+    uiCtx.globalAlpha = 1;
   }
 
   // HUD
