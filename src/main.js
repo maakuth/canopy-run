@@ -30,6 +30,8 @@ function update(dt) {
       player.doubleJump = false; player.dash = false; player.wall = false;
       unlockMsg = ''; unlockT = 0;
       state = STATE.PLAYING;
+      audio.audioInit();
+      audio.startMusic();
     }
   } else if (state === STATE.PLAYING) {
     updateWorld(world, player, dt);
@@ -44,10 +46,12 @@ function update(dt) {
           const pc = player.x + player.w / 2;
           player.vx = pc < hc ? -KNOCKBACK_X : KNOCKBACK_X;
           player.vy = KNOCKBACK_Y;
-          audio.beep(160, 0.2, 'sawtooth');
+          audio.sfxHurt();
           cameraShake(6, 0.25);
           if (player.hearts <= 0) {
             state = STATE.GAMEOVER;
+            audio.stopMusic();
+            audio.sfxGameOver();
             const d = Math.floor(player.x / 10);
             if (d > storage.bestDistance) storage.bestDistance = d;
             if ((world.score || 0) > storage.bestScore) storage.bestScore = world.score;
@@ -58,17 +62,18 @@ function update(dt) {
     }
     // ability unlocks
     const dist = Math.floor(player.x / 10);
+    audio.setMusicDistance(dist);
     if (!player.doubleJump && dist >= UNLOCK_DOUBLE) {
       player.doubleJump = true; unlockMsg = 'Double Jump unlocked! (SPACE in air)'; unlockT = 3;
-      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+      audio.sfxUnlock();
     }
     if (!player.dash && dist >= UNLOCK_DASH) {
       player.dash = true; unlockMsg = 'Dash unlocked! (SHIFT)'; unlockT = 3;
-      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+      audio.sfxUnlock();
     }
     if (!player.wall && dist >= UNLOCK_WALL) {
       player.wall = true; unlockMsg = 'Wall Slide/Jump unlocked!'; unlockT = 3;
-      audio.beep(520, 0.15, 'square'); audio.beep(780, 0.15, 'square');
+      audio.sfxUnlock();
     }
     if (unlockT > 0) unlockT -= dt;
     cameraFollow(player.x + player.w / 2, player.y + player.h / 2, dt);
@@ -76,9 +81,11 @@ function update(dt) {
     if (player.y > H + 60) {
       player.x = player.lastSafeX; player.y = player.lastSafeY; player.vx = 0; player.vy = 0;
       player.hearts -= 1;
-      audio.beep(180, 0.15, 'sawtooth');
+      audio.sfxHurt();
       if (player.hearts <= 0) {
         state = STATE.GAMEOVER;
+        audio.stopMusic();
+        audio.sfxGameOver();
         const dist = Math.floor(player.x / 10);
         if (dist > storage.bestDistance) storage.bestDistance = dist;
         if ((world.score || 0) > storage.bestScore) storage.bestScore = world.score;

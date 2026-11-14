@@ -4,6 +4,7 @@ import { GRAVITY, MOVE_SPEED, MOVE_ACCEL, MOVE_FRICTION, JUMP_VEL, JUMP_CUT,
   WALL_SLIDE_SPEED, WALL_JUMP_X, WALL_JUMP_Y } from '../config.js';
 import { aabb } from '../util/math.js';
 import { isDown, justPressed } from '../engine/input.js';
+import * as audio from '../engine/audio.js';
 
 export function createPlayer(x, y) {
   return {
@@ -17,6 +18,7 @@ export function createPlayer(x, y) {
     squash: 1, stretch: 1,
     animT: 0,
     lastSafeX: x, lastSafeY: y,
+    _wasGround: false,
   };
 }
 
@@ -53,6 +55,7 @@ export function updatePlayer(p, world, dt) {
     p.dashCd = DASH_COOLDOWN;
     p.vx = p.facing * DASH_SPEED;
     p.vy = 0;
+    audio.sfxDash();
   }
 
   // environment: wind + low gravity
@@ -111,6 +114,7 @@ export function updatePlayer(p, world, dt) {
           p.vy = -(pl.power || 320);
           p.onGround = false;
           p.squash = 0.6; p.stretch = 1.4;
+          audio.sfxBounce();
           continue;
         }
         p.y = pl.y - p.h; p.onGround = true; p.vy = 0;
@@ -134,6 +138,7 @@ export function updatePlayer(p, world, dt) {
       p.vy = -(bp.power || 320);
       p.onGround = false;
       p.squash = 0.6; p.stretch = 1.4;
+      audio.sfxBounce();
     }
   }
   if (p.onGround && p.onPlatform && p.onPlatform.type === 'moving') {
@@ -154,6 +159,7 @@ export function updatePlayer(p, world, dt) {
     p.jumpsLeft = p.doubleJump ? 1 : 0;
     p.cutDone = false;
     p.squash = 0.7; p.stretch = 1.3;
+    audio.sfxJump();
   } else if (p.jumpBuffer > 0 && p.wall && p.wallSlide) {
     // wall jump
     p.vy = WALL_JUMP_Y;
@@ -162,12 +168,14 @@ export function updatePlayer(p, world, dt) {
     p.jumpBuffer = 0;
     p.cutDone = false;
     p.squash = 0.7; p.stretch = 1.3;
+    audio.sfxJump();
   } else if (p.jumpBuffer > 0 && p.doubleJump && p.jumpsLeft > 0 && !p.onGround && !p.wallSlide) {
     p.vy = DOUBLE_JUMP_VEL;
     p.jumpBuffer = 0;
     p.jumpsLeft = 0;
     p.cutDone = false;
     p.squash = 0.7; p.stretch = 1.3;
+    audio.sfxDoubleJump();
   }
 
   // variable jump cut
@@ -175,6 +183,9 @@ export function updatePlayer(p, world, dt) {
     p.vy *= JUMP_CUT;
     p.cutDone = true;
   }
+
+  if (p.onGround && !p._wasGround) audio.sfxLand();
+  p._wasGround = p.onGround;
 
   // recover squash/stretch
   p.squash += (1 - p.squash) * Math.min(1, dt * 10);

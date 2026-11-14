@@ -9,10 +9,10 @@ export function updateCollectibles(world, player) {
       c.collected = true;
       if (c.type === 'heart') {
         if (player.hearts < HEARTS_MAX) player.hearts += 1;
-        audio.beep(660, 0.12, 'sine');
+        audio.sfxHeart();
       } else {
         world.score += c.value || 10;
-        audio.beep(880, 0.06, 'square');
+        audio.sfxCollect();
       }
       // particle
       world.particles.push({ x: c.x + c.w/2, y: c.y + c.h/2, vx: (Math.random()-0.5)*60, vy: -80, life: 0.5, color: c.type === 'heart' ? '#e85d75' : '#ffd166', size: 2 });
