@@ -1,0 +1,4 @@
+- This is platformer game for web platform
+- Use simple visuals and pixel graphics on canvas, it should be performant on older PCs
+- Commit your work after each implementation prompt, document changes in commit messages in detail
+- Keep markdown design docs up to date under docs/
