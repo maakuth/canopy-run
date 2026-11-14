@@ -28,7 +28,7 @@ restart) are shown automatically on touch devices. On desktop they appear
 on mouse movement and hide after a short idle delay.
 
 ## Performance
-Internal resolution 320×180, integer (nearest-neighbor) scaling up to viewport, no frameworks, object pooling
+Internal resolution 320×180, nearest-neighbor scaling to fit viewport (non-integer allowed), no frameworks, object pooling
 for particles, culling of off-screen entities. Targets older PCs.
 
 ## Deploy

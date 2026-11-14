@@ -13,9 +13,11 @@ uiCtx.imageSmoothingEnabled = true;
 let scale = 1;
 
 export function updateScale() {
-  scale = Math.max(1, Math.floor(Math.min(window.innerWidth / W, window.innerHeight / H)));
-  const cssW = W * scale;
-  const cssH = H * scale;
+  // Scale to fit the viewport exactly, allowing non-integer factors so the
+  // game fills the available space instead of snapping to whole pixels.
+  scale = Math.max(1, Math.min(window.innerWidth / W, window.innerHeight / H));
+  const cssW = Math.round(W * scale);
+  const cssH = Math.round(H * scale);
   canvas.style.width = `${cssW}px`;
   canvas.style.height = `${cssH}px`;
   uiCanvas.style.width = `${cssW}px`;

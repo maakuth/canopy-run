@@ -76,8 +76,7 @@ MENU, PLAYING, PAUSED, GAMEOVER; tutorial banners during early play.
 9. Performance & docs — done
 
 ## Performance notes
-- Internal resolution 320×180; display uses integer (nearest-neighbor) scaling up to
-  viewport size (largest whole multiple that fits), so each game pixel maps to an
-  identical block of screen pixels.
+- Internal resolution 320×180; display scales to fit the viewport (nearest-neighbor),
+  allowing non-integer factors so the game fills the available space.
 - Entities culled behind camera; particles pooled via array reuse.
 - No build step; ES modules loaded natively.
