@@ -8,13 +8,17 @@ let muted = storage.muted;
 
 // ---- Track registry ---------------------------------------------------------
 const TRACKS = {
-  chiptune: { id: 'chiptune', name: 'Chiptune', bpmBase: 110, bpmStep: 8 },
-  souljazz: { id: 'souljazz', name: 'Soul/Jazz', bpmBase: 76, bpmStep: 4 },
+  chiptune: { id: 'chiptune', name: 'Chiptune', bpmBase: 110, bpmStep: 8, gain: 0.28 },
+  souljazz: { id: 'souljazz', name: 'Soul/Jazz', bpmBase: 76, bpmStep: 4, gain: 0.5 },
 };
 const TRACK_ORDER = ['chiptune', 'souljazz'];
 
 let currentTrack = (storage.musicTrack && TRACKS[storage.musicTrack])
   ? storage.musicTrack : 'chiptune';
+
+function currentTrackGain() {
+  return (TRACKS[currentTrack] && TRACKS[currentTrack].gain) || 0.28;
+}
 
 // ---- Music scheduler state --------------------------------------------------
 let musicRunning = false;
@@ -73,7 +77,7 @@ export function audioInit() {
     master = ctx.createGain();
     master.gain.value = muted ? 0 : 0.7;
     master.connect(ctx.destination);
-    musicGain = ctx.createGain(); musicGain.gain.value = 0.28; musicGain.connect(master);
+    musicGain = ctx.createGain(); musicGain.gain.value = currentTrackGain(); musicGain.connect(master);
     sfxGain = ctx.createGain(); sfxGain.gain.value = 0.6; sfxGain.connect(master);
 
     // reusable noise buffer for percussion
@@ -103,6 +107,7 @@ export function setMusicTrack(id) {
   if (!TRACKS[id] || id === currentTrack) return;
   currentTrack = id;
   storage.musicTrack = id;
+  if (musicGain) musicGain.gain.value = currentTrackGain();
   if (musicRunning) {
     stopMusic();
     startMusic();
@@ -311,6 +316,7 @@ export function startMusic() {
   audioInit();
   if (!ctx || musicRunning) return;
   musicRunning = true;
+  if (musicGain) musicGain.gain.value = currentTrackGain();
   const t = TRACKS[currentTrack];
   musicTier = 0;
   beatDur = 60 / t.bpmBase;

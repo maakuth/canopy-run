@@ -24,3 +24,4 @@ Two synthesized soundtracks, selectable at any time with **T** (persisted):
 - A reusable noise buffer provides snare/hat; kick is a sine sweep.
 - When muted, schedulers advance time without scheduling to preserve position.
 - Track switching restarts the scheduler and resets cursors.
+- Per-track music bus gain: Chiptune 0.28, Soul/Jazz 0.50 (ambient track was too quiet).
