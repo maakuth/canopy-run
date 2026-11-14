@@ -53,13 +53,18 @@ Web Audio synthesized: SFX + music loop; mute persisted.
 ### States
 MENU, PLAYING, PAUSED, GAMEOVER; tutorial banners during early play.
 
-## Implementation Phases
-1. Scaffold & engine skeleton
-2. Player physics & base movement
-3. Procedural world v1
-4. Collectibles, scoring, hearts, HUD
-5. Advanced moves + unlocks
-6. Hazards & difficulty
-7. Audio
-8. Tutorial & polish
-9. Performance & docs
+## Implementation Phases (status)
+1. Scaffold & engine skeleton — done
+2. Player physics & base movement — done
+3. Procedural world v1 — done
+4. Collectibles, scoring, hearts, HUD — done
+5. Advanced moves + unlocks — done
+6. Hazards & difficulty — done
+7. Audio — done
+8. Tutorial & polish — done
+9. Performance & docs — done
+
+## Performance notes
+- Internal resolution 320×180; CSS scales with pixelated rendering.
+- Entities culled behind camera; particles pooled via array reuse.
+- No build step; ES modules loaded natively.
