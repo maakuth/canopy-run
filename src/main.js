@@ -7,6 +7,7 @@ import * as audio from './engine/audio.js';
 import { camera, cameraFollow, cameraOffset } from './engine/camera.js';
 import { createPlayer, updatePlayer } from './game/player.js';
 import { createWorld, updateWorld } from './game/world.js';
+import { drawParticles } from './game/particles.js';
 
 export const STATE = { MENU: 0, PLAYING: 1, PAUSED: 2, GAMEOVER: 3 };
 let state = STATE.MENU;
@@ -36,8 +37,9 @@ function update(dt) {
       audio.beep(180, 0.15, 'sawtooth');
       if (player.hearts <= 0) {
         state = STATE.GAMEOVER;
-        const dist = Math.floor(player.x / 10); // PIXELS_PER_METER
+        const dist = Math.floor(player.x / 10);
         if (dist > storage.bestDistance) storage.bestDistance = dist;
+        if ((world.score || 0) > storage.bestScore) storage.bestScore = world.score;
       }
     }
   } else if (state === STATE.PAUSED) {
@@ -57,6 +59,13 @@ function render(alpha) {
   // ground fill backdrop
   rect(0, 0, W, H, '#1b3a2a');
 
+  // collectibles
+  for (const c of world.collectibles) {
+    if (c.collected) continue;
+    const col = c.type === 'heart' ? '#e85d75' : '#ffd166';
+    rect(c.x - ox, c.y - oy, c.w, c.h, col);
+  }
+
   // platforms
   for (const pl of world.platforms) {
     rect(pl.x - ox, pl.y - oy, pl.w, pl.h, pl.y >= H - 30 ? '#3a2a1a' : '#6b4a2a');
@@ -72,12 +81,15 @@ function render(alpha) {
   // eye
   rect(cx + (player.facing > 0 ? 2 : -4), cy - h / 2 + 2, 2, 2, '#1b3a2a');
 
+  drawParticles(ctx, world, ox, oy);
+
   // HUD
   text('Canopy Run', 8, 6, '#e8f0e4', 10);
   text('Best: ' + storage.bestDistance + 'm', W - 8, 6, '#e8f0e4', 8, 'right');
   if (state === STATE.PLAYING || state === STATE.PAUSED) {
     const dist = Math.floor(player.x / 10);
     text(dist + 'm', W / 2, 6, '#e8f0e4', 8, 'center');
+    text('Score ' + (world.score || 0), W / 2, H - 12, '#e8f0e4', 7, 'center');
   }
   // hearts
   for (let i = 0; i < player.hearts; i++) rect(8 + i * 10, 18, 8, 7, '#e85d75');

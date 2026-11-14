@@ -32,18 +32,25 @@ export function generateChunk(world, rng, startX, tier, groundYRef) {
 
 // Template functions: (world, rng, startX, width, groundYRef, tier)
 const T = (world, x, y, w, h, type = 'solid') => {
-  world.platforms.push({ x, y, w, h, type, vx: 0, vy: 0, crumble: false, crumbleT: 0 });
+  world.platforms.push({ x, y, w, h, type, vx: 0, vy: 0, crumble: false, crumbleT: 0,
+    minX: x, maxX: x + w, baseY: y, moveT: 0 });
+};
+
+const seed = (world, x, y, kind = 'seed') => {
+  world.collectibles.push({ x, y, w: 6, h: 6, type: kind, collected: false, value: kind === 'heart' ? 0 : 10 });
 };
 
 function flat(world, rng, sx, w, g, tier) {
   T(world, sx, g.y, w, 16, 'solid');
-  // floating platforms
   const n = rng.int(1, 2);
   for (let i = 0; i < n; i++) {
     const px = sx + rng.int(24, w - 40);
     const py = g.y - rng.int(32, 64);
-    T(world, px, py, rng.int(32, 56), 8, 'solid');
+    const pw = rng.int(32, 56);
+    T(world, px, py, pw, 8, 'solid');
+    seed(world, px + pw/2 - 3, py - 10, rng.bool(0.08) ? 'heart' : 'seed');
   }
+  if (rng.bool(0.5)) seed(world, sx + rng.int(16, w - 16), g.y - 16, 'seed');
 }
 
 function gapSmall(world, rng, sx, w, g, tier) {
@@ -52,13 +59,15 @@ function gapSmall(world, rng, sx, w, g, tier) {
   T(world, sx, g.y, leftW, 16, 'solid');
   const rightX = sx + leftW + gap;
   T(world, rightX, g.y, w - leftW - gap, 16, 'solid');
-  // bridge platform over gap
   const bx = sx + leftW + gap / 2 - 24;
   const by = g.y - rng.int(24, 40);
   T(world, bx, by, 48, 8, 'solid');
-  // extra floating
+  seed(world, bx + 21, by - 10, 'seed');
   if (rng.bool(0.6)) {
-    T(world, sx + rng.int(16, w - 40), g.y - rng.int(56, 80), 40, 8, 'solid');
+    const fx = sx + rng.int(16, w - 40);
+    const fy = g.y - rng.int(56, 80);
+    T(world, fx, fy, 40, 8, 'solid');
+    seed(world, fx + 17, fy - 10, rng.bool(0.1) ? 'heart' : 'seed');
   }
 }
 
@@ -69,8 +78,10 @@ function steps(world, rng, sx, w, g, tier) {
   T(world, sx, g.y, split, 16, 'solid');
   T(world, sx + split, g.y + stepH, w - split, 16, 'solid');
   g.y = g.y + stepH; // continuity: next chunk ground at new height
-  // floating
-  T(world, sx + rng.int(20, w - 40), Math.min(g.y, g.y - stepH) - rng.int(32, 56), 40, 8, 'solid');
+  const fx = sx + rng.int(20, w - 40);
+  const fy = Math.min(g.y, g.y - stepH) - rng.int(32, 56);
+  T(world, fx, fy, 40, 8, 'solid');
+  seed(world, fx + 17, fy - 10, 'seed');
 }
 
 function platforms(world, rng, sx, w, g, tier) {
@@ -80,6 +91,7 @@ function platforms(world, rng, sx, w, g, tier) {
   const n = rng.int(3, 5);
   for (let i = 0; i < n; i++) {
     T(world, cx, cy, 32, 8, 'solid');
+    if (rng.bool(0.7)) seed(world, cx + 13, cy - 10, 'seed');
     cx += rng.int(28, 44);
     cy -= rng.int(8, 16);
     if (cx > sx + w - 40) break;
