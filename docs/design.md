@@ -32,6 +32,7 @@ Util: rng, math, pool.
 - Endless horizontal run; distance = score basis (+ collectible seeds).
 - Tiers by distance: 0 (0–250), 1 (250–500), 2 (500–750), 3 (750–1500),
   4 (1500+). Generator only emits chunks passable with unlocked abilities.
+  Early (tier 0) gaps are limited to 2 tiles so a basic jump can always clear them.
 
 ### World
 - Chunk width 160–240 px; templates per tier; ground height continuous.

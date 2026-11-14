@@ -6,8 +6,8 @@ Three synthesized soundtracks, selectable at any time with **T** (persisted):
 1. **Chiptune** — original square/triangle loop, BPM `110 + tier*8`.
 2. **Ambient Soul/Jazz** — warm pads, electric-piano stabs, walking bass, sparse
    blues/major-pentatonic melody. Base BPM 76, +4 per tier (max ~92).
-3. **Chiptune (Rough)** — rougher sawtooth arpeggios over the chiptune melody,
-   sawtooth bass, and noise percussion (kick/snare/hats). Base BPM 118, +8 per tier.
+3. **Chiptune (Rough)** — sawtooth arpeggios following a C–Am–F–G chord
+   progression, sawtooth bass, and noise percussion (kick/snare/hats). Base BPM 118, +8 per tier.
 
 ## Soul/Jazz progression
 8-bar loop, 2 beats per chord:

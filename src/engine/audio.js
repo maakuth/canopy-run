@@ -296,33 +296,42 @@ function schedulerJazz(lookahead) {
   }
 }
 
-// ---- Rough chiptune scheduler (arpeggios + noise percussion) ---------------
+// ---- Rough chiptune scheduler (chord-progression arpeggios + noise perc.) ----
+// Chord progression (I - vi - IV - V), 4 beats per chord.
+const ROUGH_CHORDS = [
+  [60, 64, 67], // Cmaj
+  [57, 60, 64], // Am
+  [65, 69, 72], // Fmaj
+  [67, 71, 74], // Gmaj
+];
 function schedulerChiptuneRough(lookahead) {
   while (nextNoteTime < ctx.currentTime + lookahead) {
-    const mDeg = MELODY[trackState.melodyIdx % MELODY.length];
-    if (mDeg >= 0) {
-      const d = mDeg % PENT.length;
-      const arp = [d, (d + 2) % PENT.length, (d + 4) % PENT.length, (d + 2) % PENT.length];
-      const n = (musicTier >= 3) ? 5 : 4;
-      const step = beatDur / 4;
-      for (let i = 0; i < n; i++) {
-        const freq = (i < arp.length)
-        ? PENT[arp[i] % PENT.length]
-        : PENT[d % PENT.length] * 2;
-      scheduleTone(freq, nextNoteTime + i * step, step * 0.85, 'sawtooth', 0.1, 0.005, 0.04, musicTier >= 3 ? 12 : 0);
-      }
-      if (musicTier >= 2) {
-        // extra high octave stab
-        scheduleTone(PENT[d % PENT.length] * 2, nextNoteTime, beatDur * 0.4, 'square', 0.06, 0.005, 0.05);
-      }
+    const beat = trackState.beatIdx % 16;
+    const chordIdx = Math.floor(beat / 4) % ROUGH_CHORDS.length;
+    const chord = ROUGH_CHORDS[chordIdx];
+
+    // Arpeggio following the current chord: up/down pattern.
+    const pat = (musicTier >= 3)
+      ? [0, 1, 2, 1, 0, 2]   // 6 notes, denser
+      : (musicTier >= 1 ? [0, 1, 2, 1] : [0, 2, 1]); // 3-4 notes
+    const n = pat.length;
+    const step = beatDur / n;
+    for (let i = 0; i < n; i++) {
+      const freq = midiToFreq(chord[pat[i] % chord.length]);
+      scheduleTone(freq, nextNoteTime + i * step, step * 0.8, 'sawtooth', 0.1, 0.005, 0.04, musicTier >= 3 ? 12 : 0);
     }
-    if (trackState.melodyIdx % 2 === 0) {
-      const bDeg = BASS[trackState.bassIdx % BASS.length];
-      scheduleTone(BASSF[bDeg % BASSF.length], nextNoteTime, beatDur * 1.6, 'sawtooth', 0.16, 0.02, 0.1, -4);
-      trackState.bassIdx++;
+    // octave shimmer at tier 2+
+    if (musicTier >= 2) {
+      scheduleTone(midiToFreq(chord[chord.length - 1] + 12), nextNoteTime, beatDur * 0.5, 'square', 0.05, 0.01, 0.08);
     }
+
+    // bass: root on first beat of each chord block
+    if (beat % 4 === 0) {
+      scheduleBassNote(chord[0] - 12, nextNoteTime);
+    }
+
     // noise percussion
-    const beatInBar = trackState.melodyIdx % 4;
+    const beatInBar = beat % 4;
     if (musicTier >= 1) {
       if (beatInBar === 0 || beatInBar === 2) kick(nextNoteTime);
       if (beatInBar === 1 || beatInBar === 3) snare(nextNoteTime);
@@ -336,7 +345,7 @@ function schedulerChiptuneRough(lookahead) {
     }
 
     nextNoteTime += beatDur;
-    trackState.melodyIdx++;
+    trackState.beatIdx = (trackState.beatIdx + 1) % 16;
   }
 }
 
@@ -367,8 +376,10 @@ export function startMusic() {
   musicTier = 0;
   beatDur = 60 / t.bpmBase;
   nextNoteTime = ctx.currentTime + 0.05;
-  if (currentTrack === 'chiptune' || currentTrack === 'chiptunerough') {
+  if (currentTrack === 'chiptune') {
     trackState = { melodyIdx: 0, bassIdx: 0 };
+  } else if (currentTrack === 'chiptunerough') {
+    trackState = { beatIdx: 0 };
   } else {
     trackState = { stepIdx: 0 };
   }

@@ -85,13 +85,17 @@ function flat(world, rng, sx, w, g, tier) {
 }
 
 function gapSmall(world, rng, sx, w, g, tier) {
-  const gap = rng.int(2, 3) * TILE;
+  // Only generate gaps that are crossable with the abilities unlocked at this tier.
+  // Basic jump (tier 0) can reliably clear ~2 tiles; double jump (tier 1+) ~4+.
+  const maxTiles = tier === 0 ? 2 : 3;
+  const minTiles = 2;
+  const gap = rng.int(minTiles, maxTiles) * TILE;
   const leftW = rng.int(48, w - gap - 48);
   T(world, sx, g.y, leftW, 16, 'solid');
   const rightX = sx + leftW + gap;
   T(world, rightX, g.y, w - leftW - gap, 16, 'solid');
   const bx = sx + leftW + gap / 2 - 24;
-  const by = g.y - rng.int(24, 40);
+  const by = g.y - rng.int(24, tier === 0 ? 32 : 40);
   if (tier >= 2 && rng.bool(0.4)) crumblingPlatform(world, bx, by, 48);
   else T(world, bx, by, 48, 8, 'solid');
   seed(world, bx + 21, by - 10, 'seed');
