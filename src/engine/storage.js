@@ -16,4 +16,6 @@ export const storage = {
   set muted(v) { this.set(STORAGE_KEYS.muted, !!v); },
   get tutorialSeen() { return this.get(STORAGE_KEYS.tutorialSeen, false); },
   set tutorialSeen(v) { this.set(STORAGE_KEYS.tutorialSeen, !!v); },
+  get musicTrack() { return this.get(STORAGE_KEYS.musicTrack, 'chiptune'); },
+  set musicTrack(v) { this.set(STORAGE_KEYS.musicTrack, v); },
 };

@@ -45,7 +45,10 @@ Keyboard only: Arrow/WASD move, Space jump, Shift dash, Esc pause, R restart,
 M mute.
 
 ### Audio
-Web Audio synthesized: SFX + music loop; mute persisted.
+Web Audio synthesized: SFX + two selectable music loops; mute persisted.
+Tracks: "Chiptune" (original) and "Ambient Soul/Jazz" (pads, keys, walking bass,
+sparse melody). Press T to cycle tracks (choice persisted). Music tiers by distance;
+the jazz track adds light percussion (kick/snare/hat) from 250 m. SFX unchanged.
 
 ### Persistence (localStorage)
 `bestDistance`, `bestScore`, `muted`, `tutorialSeen`.

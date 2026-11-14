@@ -58,4 +58,5 @@ export const STORAGE_KEYS = {
   bestScore: 'canopy.bestScore',
   muted: 'canopy.muted',
   tutorialSeen: 'canopy.tutorialSeen',
+  musicTrack: 'canopy.musicTrack',
 };

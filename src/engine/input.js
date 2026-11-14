@@ -11,11 +11,12 @@ const map = {
   Escape: 'pause',
   KeyR: 'restart',
   KeyM: 'mute',
+  KeyT: 'track',
 };
 
 export const input = {
-  pressed: { left:false, right:false, up:false, down:false, jump:false, dash:false, pause:false, restart:false, mute:false },
-  justPressed: { left:false, right:false, up:false, down:false, jump:false, dash:false, pause:false, restart:false, mute:false },
+  pressed: { left:false, right:false, up:false, down:false, jump:false, dash:false, pause:false, restart:false, mute:false, track:false },
+  justPressed: { left:false, right:false, up:false, down:false, jump:false, dash:false, pause:false, restart:false, mute:false, track:false },
   _prev: {},
 };
 

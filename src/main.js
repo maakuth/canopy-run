@@ -17,10 +17,17 @@ let world = createWorld();
 const player = createPlayer(40, H - 40);
 let unlockMsg = '';
 let unlockT = 0;
+let trackMsg = '';
+let trackMsgT = 0;
 
 function update(dt) {
   if (justPressed('jump') || justPressed('pause') || justPressed('restart') || justPressed('mute')) audio.audioInit();
   if (justPressed('mute')) audio.toggleMute();
+  if (justPressed('track')) {
+    audio.cycleMusicTrack();
+    trackMsg = 'Soundtrack: ' + audio.getMusicTrackName();
+    trackMsgT = 2;
+  }
 
   if (state === STATE.MENU) {
     if (justPressed('jump')) {
@@ -29,11 +36,15 @@ function update(dt) {
       player.lastSafeX = 40; player.lastSafeY = H - 40;
       player.doubleJump = false; player.dash = false; player.wall = false;
       unlockMsg = ''; unlockT = 0;
+      trackMsg = ''; trackMsgT = 0;
+      audio.audioInit();
+      audio.startMusic();
       state = STATE.PLAYING;
       audio.audioInit();
       audio.startMusic();
     }
   } else if (state === STATE.PLAYING) {
+    audio.setMusicDistance(Math.floor(player.x / 10));
     updateWorld(world, player, dt);
     updatePlayer(player, world, dt);
     // hazard damage
@@ -97,6 +108,7 @@ function update(dt) {
     if (justPressed('restart')) state = STATE.MENU;
   }
 
+  if (trackMsgT > 0) trackMsgT -= dt;
   inputEndFrame();
 }
 
@@ -160,6 +172,11 @@ function render(alpha) {
     text(unlockMsg, W / 2, 36, '#ffd166', 9, 'center');
     ctx.globalAlpha = 1;
   }
+  if (trackMsgT > 0) {
+    ctx.globalAlpha = Math.min(1, trackMsgT);
+    text(trackMsg, W / 2, 50, '#a8dadc', 9, 'center');
+    ctx.globalAlpha = 1;
+  }
   if (world.activeTrigger && world.activeTrigger.t > 0) {
     ctx.globalAlpha = Math.min(1, world.activeTrigger.t);
     text(world.activeTrigger.msg, W / 2, H - 28, '#a8dadc', 8, 'center');
@@ -176,6 +193,8 @@ function render(alpha) {
   }
   // hearts
   for (let i = 0; i < player.hearts; i++) rect(8 + i * 10, 18, 8, 7, '#e85d75');
+  // current soundtrack
+  text('Track: ' + audio.getMusicTrackName() + ' (T)', 8, H - 8, '#a8dadc', 6);
 
   if (state === STATE.MENU) {
     text('Press SPACE to start', W / 2, H / 2 - 6, '#e8f0e4', 10, 'center');
