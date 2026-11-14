@@ -6,12 +6,12 @@ import { storage } from './engine/storage.js';
 import * as audio from './engine/audio.js';
 import { camera, cameraFollow, cameraOffset } from './engine/camera.js';
 import { createPlayer, updatePlayer } from './game/player.js';
-import { createTestWorld } from './game/world.js';
+import { createWorld, updateWorld } from './game/world.js';
 
 export const STATE = { MENU: 0, PLAYING: 1, PAUSED: 2, GAMEOVER: 3 };
 let state = STATE.MENU;
 
-const world = createTestWorld();
+let world = createWorld();
 const player = createPlayer(40, H - 40);
 
 function update(dt) {
@@ -20,19 +20,25 @@ function update(dt) {
 
   if (state === STATE.MENU) {
     if (justPressed('jump')) {
-      // reset
+      world = createWorld();
       player.x = 40; player.y = H - 40; player.vx = 0; player.vy = 0; player.hearts = 3;
+      player.lastSafeX = 40; player.lastSafeY = H - 40;
       state = STATE.PLAYING;
     }
   } else if (state === STATE.PLAYING) {
+    updateWorld(world, player, dt);
     updatePlayer(player, world.platforms, dt);
     cameraFollow(player.x + player.w / 2, player.y + player.h / 2, dt);
     if (justPressed('pause')) state = STATE.PAUSED;
-    // fall below world -> respawn
     if (player.y > H + 60) {
       player.x = player.lastSafeX; player.y = player.lastSafeY; player.vx = 0; player.vy = 0;
       player.hearts -= 1;
-      if (player.hearts <= 0) state = STATE.GAMEOVER;
+      audio.beep(180, 0.15, 'sawtooth');
+      if (player.hearts <= 0) {
+        state = STATE.GAMEOVER;
+        const dist = Math.floor(player.x / 10); // PIXELS_PER_METER
+        if (dist > storage.bestDistance) storage.bestDistance = dist;
+      }
     }
   } else if (state === STATE.PAUSED) {
     if (justPressed('pause')) state = STATE.PLAYING;
@@ -69,6 +75,10 @@ function render(alpha) {
   // HUD
   text('Canopy Run', 8, 6, '#e8f0e4', 10);
   text('Best: ' + storage.bestDistance + 'm', W - 8, 6, '#e8f0e4', 8, 'right');
+  if (state === STATE.PLAYING || state === STATE.PAUSED) {
+    const dist = Math.floor(player.x / 10);
+    text(dist + 'm', W / 2, 6, '#e8f0e4', 8, 'center');
+  }
   // hearts
   for (let i = 0; i < player.hearts; i++) rect(8 + i * 10, 18, 8, 7, '#e85d75');
 
