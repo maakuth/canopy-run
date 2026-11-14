@@ -1,12 +1,13 @@
-import { W, H, UNLOCK_DOUBLE, UNLOCK_DASH, UNLOCK_WALL } from './config.js';
+import { W, H, UNLOCK_DOUBLE, UNLOCK_DASH, UNLOCK_WALL, INVULN_TIME, KNOCKBACK_X, KNOCKBACK_Y, HEARTS_MAX } from './config.js';
 import { ctx, clear, rect, text } from './engine/renderer.js';
 import { Loop } from './engine/loop.js';
 import { inputEndFrame, justPressed } from './engine/input.js';
 import { storage } from './engine/storage.js';
 import * as audio from './engine/audio.js';
-import { camera, cameraFollow, cameraOffset } from './engine/camera.js';
+import { camera, cameraFollow, cameraOffset, cameraShake } from './engine/camera.js';
 import { createPlayer, updatePlayer } from './game/player.js';
 import { createWorld, updateWorld } from './game/world.js';
+import { aabb } from './util/math.js';
 import { drawParticles } from './game/particles.js';
 
 export const STATE = { MENU: 0, PLAYING: 1, PAUSED: 2, GAMEOVER: 3 };
@@ -32,7 +33,29 @@ function update(dt) {
     }
   } else if (state === STATE.PLAYING) {
     updateWorld(world, player, dt);
-    updatePlayer(player, world.platforms, dt);
+    updatePlayer(player, world, dt);
+    // hazard damage
+    if (player.invuln <= 0) {
+      for (const hz of (world.hazards || [])) {
+        if (aabb(player.x, player.y, player.w, player.h, hz.x, hz.y, hz.w, hz.h)) {
+          player.hearts -= 1;
+          player.invuln = INVULN_TIME;
+          const hc = hz.x + hz.w / 2;
+          const pc = player.x + player.w / 2;
+          player.vx = pc < hc ? -KNOCKBACK_X : KNOCKBACK_X;
+          player.vy = KNOCKBACK_Y;
+          audio.beep(160, 0.2, 'sawtooth');
+          cameraShake(6, 0.25);
+          if (player.hearts <= 0) {
+            state = STATE.GAMEOVER;
+            const d = Math.floor(player.x / 10);
+            if (d > storage.bestDistance) storage.bestDistance = d;
+            if ((world.score || 0) > storage.bestScore) storage.bestScore = world.score;
+          }
+          break;
+        }
+      }
+    }
     // ability unlocks
     const dist = Math.floor(player.x / 10);
     if (!player.doubleJump && dist >= UNLOCK_DOUBLE) {
@@ -78,6 +101,26 @@ function render(alpha) {
   // ground fill backdrop
   rect(0, 0, W, H, '#1b3a2a');
 
+  // wind zones
+  for (const z of (world.windZones || [])) {
+    ctx.globalAlpha = 0.18;
+    rect(z.x - ox, z.y - oy, z.w, z.h, '#a8dadc');
+    ctx.globalAlpha = 1;
+  }
+  // low grav zones
+  for (const z of (world.lowGravZones || [])) {
+    ctx.globalAlpha = 0.18;
+    rect(z.x - ox, z.y - oy, z.w, z.h, '#b39ddb');
+    ctx.globalAlpha = 1;
+  }
+  // bounce pads
+  for (const b of (world.bouncePads || [])) {
+    rect(b.x - ox, b.y - oy, b.w, b.h, '#ff9f1c');
+  }
+  // hazards (thorns)
+  for (const hz of (world.hazards || [])) {
+    rect(hz.x - ox, hz.y - oy, hz.w, hz.h, '#c0392b');
+  }
   // collectibles
   for (const c of world.collectibles) {
     if (c.collected) continue;
@@ -87,7 +130,10 @@ function render(alpha) {
 
   // platforms
   for (const pl of world.platforms) {
-    rect(pl.x - ox, pl.y - oy, pl.w, pl.h, pl.y >= H - 30 ? '#3a2a1a' : '#6b4a2a');
+    let col = pl.y >= H - 30 ? '#3a2a1a' : '#6b4a2a';
+    if (pl.type === 'moving') col = '#5dade2';
+    if (pl.type === 'crumbling') col = pl.crumble ? '#a1887f' : '#8d6e63';
+    rect(pl.x - ox, pl.y - oy, pl.w, pl.h, col);
     if (pl.y < H - 30) rect(pl.x - ox, pl.y - oy, pl.w, 2, '#7fc96a');
     if (pl.y >= H - 30) rect(pl.x - ox, pl.y - oy, pl.w, 4, '#5fa34a');
   }

@@ -20,7 +20,11 @@ export function createPlayer(x, y) {
   };
 }
 
-export function updatePlayer(p, platforms, dt) {
+export function updatePlayer(p, world, dt) {
+  const platforms = world.platforms || [];
+  const windZones = world.windZones || [];
+  const lowGravZones = world.lowGravZones || [];
+  const bouncePads = world.bouncePads || [];
   if (p.invuln > 0) p.invuln -= dt;
   if (p.dashCd > 0) p.dashCd -= dt;
   if (p.dashTimer > 0) { p.dashTimer -= dt; if (p.dashTimer <= 0) p.dashing = false; }
@@ -51,9 +55,22 @@ export function updatePlayer(p, platforms, dt) {
     p.vy = 0;
   }
 
+  // environment: wind + low gravity
+  let gravMult = 1;
+  const cx = p.x + p.w / 2, cy = p.y + p.h / 2;
+  for (const z of lowGravZones) {
+    if (cx > z.x && cx < z.x + z.w && cy > z.y && cy < z.y + z.h) { gravMult = z.mult || 0.4; }
+  }
+  for (const z of windZones) {
+    if (cx > z.x && cx < z.x + z.w && cy > z.y && cy < z.y + z.h) {
+      p.vx += (z.force || 0) * dt;
+      if (Math.abs(p.vx) > MOVE_SPEED * 1.6) p.vx = Math.sign(p.vx) * MOVE_SPEED * 1.6;
+    }
+  }
+
   // gravity
   if (!p.dashing) {
-    p.vy += GRAVITY * dt;
+    p.vy += GRAVITY * gravMult * dt;
     if (p.vy > MAX_FALL) p.vy = MAX_FALL;
   }
 
@@ -84,19 +101,45 @@ export function updatePlayer(p, platforms, dt) {
 
   // move Y
   p.onGround = false;
+  p.onPlatform = null;
   p.y += p.vy * dt;
   for (const pl of platforms) {
     if (aabb(p.x, p.y, p.w, p.h, pl.x, pl.y, pl.w, pl.h)) {
       if (p.vy > 0) {
+        if (pl.type === 'bounce') {
+          p.y = pl.y - p.h;
+          p.vy = -(pl.power || 320);
+          p.onGround = false;
+          p.squash = 0.6; p.stretch = 1.4;
+          continue;
+        }
         p.y = pl.y - p.h; p.onGround = true; p.vy = 0;
+        p.onPlatform = pl;
         p.jumpsLeft = p.doubleJump ? 1 : 0;
         p.cutDone = false;
         p.lastSafeX = p.x; p.lastSafeY = p.y;
+        if (pl.type === 'crumbling') {
+          pl.crumble = true;
+          if (!pl.crumbleT || pl.crumbleT <= 0) pl.crumbleT = 0.7;
+        }
       } else if (p.vy < 0) {
         p.y = pl.y + pl.h; p.vy = 0;
       }
     }
   }
+  // bounce pads (separate entities)
+  for (const bp of bouncePads) {
+    if (aabb(p.x, p.y, p.w, p.h, bp.x, bp.y, bp.w, bp.h) && p.vy > 0) {
+      p.y = bp.y - p.h;
+      p.vy = -(bp.power || 320);
+      p.onGround = false;
+      p.squash = 0.6; p.stretch = 1.4;
+    }
+  }
+  if (p.onGround && p.onPlatform && p.onPlatform.type === 'moving') {
+    p.x += (p.onPlatform.vx || 0) * dt;
+  }
+  if (!p.onGround) p.onPlatform = null;
 
   // coyote
   if (p.onGround) p.coyote = COYOTE;

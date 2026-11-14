@@ -52,6 +52,9 @@ export function updateWorld(world, player, dt) {
   world.platforms = world.platforms.filter(p => p.x + p.w > cutoff);
   if (world.collectibles) world.collectibles = world.collectibles.filter(c => c.x + c.w > cutoff);
   if (world.hazards) world.hazards = world.hazards.filter(h => h.x + (h.w||0) > cutoff);
+  if (world.windZones) world.windZones = world.windZones.filter(z => z.x + z.w > cutoff);
+  if (world.lowGravZones) world.lowGravZones = world.lowGravZones.filter(z => z.x + z.w > cutoff);
+  if (world.bouncePads) world.bouncePads = world.bouncePads.filter(b => b.x + b.w > cutoff);
   for (const pl of world.platforms) {
     if (pl.type === 'moving') {
       pl.x += (pl.vx || 0) * dt;
