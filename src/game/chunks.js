@@ -101,6 +101,7 @@ function gapSmall(world, rng, sx, w, g, tier) {
     T(world, fx, fy, 40, 8, 'solid');
     seed(world, fx + 17, fy - 10, rng.bool(0.1) ? 'heart' : 'seed');
   }
+  if (tier === 0) world.triggers.push({ x: sx + leftW - 8, y: g.y - 40, w: gap + 16, h: 40, text: 'Jump across gaps', fired: false });
   if (tier >= 1) thorn(world, sx + leftW + rng.int(0, gap-12), g.y - 8);
   if (tier >= 3 && rng.bool(0.3)) windZone(world, sx, g.y - 50, w, 50, rng.bool() ? 100 : -100);
 }

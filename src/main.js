@@ -160,6 +160,11 @@ function render(alpha) {
     text(unlockMsg, W / 2, 36, '#ffd166', 9, 'center');
     ctx.globalAlpha = 1;
   }
+  if (world.activeTrigger && world.activeTrigger.t > 0) {
+    ctx.globalAlpha = Math.min(1, world.activeTrigger.t);
+    text(world.activeTrigger.msg, W / 2, H - 28, '#a8dadc', 8, 'center');
+    ctx.globalAlpha = 1;
+  }
 
   // HUD
   text('Canopy Run', 8, 6, '#e8f0e4', 10);
@@ -179,8 +184,11 @@ function render(alpha) {
     text('PAUSED', W / 2, H / 2, '#e8f0e4', 14, 'center');
     text('Esc to resume', W / 2, H / 2 + 16, '#a8dadc', 8, 'center');
   } else if (state === STATE.GAMEOVER) {
-    text('GAME OVER', W / 2, H / 2 - 8, '#e85d75', 12, 'center');
-    text('Press R for menu', W / 2, H / 2 + 10, '#a8dadc', 8, 'center');
+    text('GAME OVER', W / 2, H / 2 - 16, '#e85d75', 12, 'center');
+    text('Distance: ' + Math.floor(player.x / 10) + 'm', W / 2, H / 2, '#e8f0e4', 9, 'center');
+    text('Score: ' + (world.score || 0), W / 2, H / 2 + 12, '#e8f0e4', 9, 'center');
+    text('Best: ' + storage.bestDistance + 'm  ' + storage.bestScore, W / 2, H / 2 + 24, '#a8dadc', 7, 'center');
+    text('Press R for menu', W / 2, H / 2 + 40, '#a8dadc', 8, 'center');
   }
 }
 
