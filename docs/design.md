@@ -14,6 +14,9 @@ so early runs teach fundamentals and later runs demand full mastery. High score
 - Vanilla JS + ES modules, no build step.
 - Installable PWA: `manifest.webmanifest`, service worker (`sw.js`) for offline caching,
   and app icons under `icons/`.
+- Deployment: static hosting (GitHub Pages via `.github/workflows/pages.yml`); no build step;
+  `.nojekyll` disables Jekyll processing. All asset URLs are relative so the game runs under
+  a repository subpath.
 - Commit after each implementation prompt; document changes in detail.
 
 ## Architecture

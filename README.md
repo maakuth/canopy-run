@@ -32,6 +32,21 @@ Internal resolution 320×180, nearest-neighbor scaling to fit viewport (non-inte
 for particles, culling of off-screen entities. Targets older PCs.
 
 ## Deploy
-Static files only — host on any static host (GitHub Pages, Netlify, itch.io).
-No build step required. Served over HTTPS, the game is installable as a PWA
-(manifest + service worker) and works offline after first load.
+
+Static files only — no build step required. Host on any static host (GitHub Pages,
+Netlify, itch.io).
+
+### GitHub Pages
+This repository ships a GitHub Actions workflow (`.github/workflows/pages.yml`)
+that publishes the site automatically on every push to `master`/`main`.
+
+1. Push the repository to GitHub.
+2. In the repository settings, open **Pages** and set **Source** to
+   **GitHub Actions**.
+3. Push to `master` (or run the workflow manually) — the site will be
+   published at `https://<user>.github.io/<repo>/`.
+
+The site uses only relative URLs, so it works both at the repository subpath
+above and on a custom domain. `.nojekyll` is included to disable Jekyll
+processing, and the service worker caches all game assets for offline play
+after the first load.
