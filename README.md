@@ -47,6 +47,7 @@ that publishes the site automatically on every push to `master`/`main`.
    published at `https://<user>.github.io/<repo>/`.
 
 The site uses only relative URLs, so it works both at the repository subpath
-above and on a custom domain. `.nojekyll` is included to disable Jekyll
-processing, and the service worker caches all game assets for offline play
-after the first load.
+above and on a custom domain. This repository is published at
+`https://juokse.naapurinpoika.com` (see the `CNAME` file). `.nojekyll` is
+included to disable Jekyll processing, and the service worker caches all game
+assets for offline play after the first load.
