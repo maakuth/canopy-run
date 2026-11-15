@@ -1,6 +1,5 @@
 const CACHE = 'canopy-run-v2';
 const ASSETS = [
-  './',
   './index.html',
   './style.css',
   './manifest.json',
